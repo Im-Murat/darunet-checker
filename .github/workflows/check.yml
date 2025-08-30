@@ -1,0 +1,28 @@
+name: Check Drug Availability
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # هر 15 دقیقه یک بار
+  workflow_dispatch:          # دستی هم بتونی اجرا کنی
+
+jobs:
+  check-drug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4 cloudscraper
+
+      - name: Run script
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python check.py
