@@ -17,12 +17,6 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Download last_prices.json (if exists)
-        uses: actions/download-artifact@v4
-        with:
-          name: last-prices
-          path: .
-
       - name: Install dependencies
         run: |
           pip install requests beautifulsoup4 cloudscraper
@@ -32,6 +26,7 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
+          # اگر فایل وجود نداشت، بساز
           if [ ! -f last_prices.json ]; then
             echo "{}" > last_prices.json
           fi
@@ -42,4 +37,3 @@ jobs:
         with:
           name: last-prices
           path: last_prices.json
-          if-no-files-found: ignore
