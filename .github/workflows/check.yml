@@ -2,8 +2,8 @@ name: Check Drug Availability
 
 on:
   schedule:
-  - cron: "0 */8 * * *"   # هر 8 ساعت یک بار
-  workflow_dispatch:          # دستی هم بتونی اجرا کنی
+    - cron: "0 */8 * * *"   # هر 8 ساعت یک بار
+  workflow_dispatch:        # دستی هم قابل اجرا باشه
 
 jobs:
   check-drug:
@@ -17,6 +17,12 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Download last_prices.json (if exists)
+        uses: actions/download-artifact@v3
+        with:
+          name: last-prices
+          path: .
+
       - name: Install dependencies
         run: |
           pip install requests beautifulsoup4 cloudscraper
@@ -25,4 +31,15 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python check.py
+        run: |
+          if [ ! -f last_prices.json ]; then
+            echo "{}" > last_prices.json
+          fi
+          python check.py
+
+      - name: Upload last_prices.json
+        uses: actions/upload-artifact@v3
+        with:
+          name: last-prices
+          path: last_prices.json
+          if-no-files-found: ignore
